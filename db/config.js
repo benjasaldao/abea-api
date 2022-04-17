@@ -11,7 +11,7 @@ module.exports =  {
     host: 'localhost'
   },
   production: {
-    url: URI,
+    url: config.dbUrl,
     dialect: 'postgres',
     dialectOptions: {
       ssl : {
