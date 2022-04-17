@@ -11,15 +11,13 @@ const DATABASE_URL = config.dbUrl
 const options = {
   dialect: "postgres",
   logging: config.isProd ? false : console.log,
-};
-
-if (config.isProd) {
-  options.dialectOptions = {
+  dialectOptions: {
     ssl: {
       rejectUnauthorized: false,
-    },
-  };
-}
+    }
+  }
+};
+
 
 const sequelize = new Sequelize(DATABASE_URL, options);
 
