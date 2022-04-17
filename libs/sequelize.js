@@ -6,7 +6,7 @@ const USER = encodeURIComponent(config.dbUser);
 const PASSWORD = encodeURIComponent(config.dbPassword);
 const URI = `postgres://${USER}:${PASSWORD}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
 
-const DATABASE_URL = config.isProd ? config.dbUrl : URI;
+const DATABASE_URL = config.dbUrl
 
 const options = {
   dialect: "postgres",
