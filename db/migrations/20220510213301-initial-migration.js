@@ -37,7 +37,6 @@ module.exports = {
     await queryInterface.dropTable(ORDER_TABLE);
     await queryInterface.dropTable(PRODUCT_TABLE);
     await queryInterface.dropTable(CATEGORY_TABLE);
-
     await queryInterface.dropTable(USER_TABLE);
   },
 };
