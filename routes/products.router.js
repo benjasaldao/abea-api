@@ -1,7 +1,9 @@
 const express = require("express");
+const passport = require("passport");
 
 const ProductsService = require("../services/product.service");
 const validationHandler = require("../middlewares/validationHandler");
+const { checkRoles, checkApiKey } = require("./../middlewares/authHandler");
 const {
   createProductSchema,
   updateProductSchema,
@@ -14,6 +16,7 @@ const service = new ProductsService();
 
 router.get(
   "/",
+  checkApiKey,
   validationHandler(queryProductSchema, "query"),
   async (req, res, next) => {
     try {
@@ -27,11 +30,13 @@ router.get(
 
 router.get(
   "/:id",
+  checkApiKey,
   validationHandler(getProductSchema, "params"),
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const product = service.findOne(id);
+      const product = await service.findOne(id);
+      console.log(product)
       res.json(product);
     } catch (err) {
       next(err);
@@ -41,6 +46,9 @@ router.get(
 
 router.post(
   "/",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
+  checkRoles("admin"),
   validationHandler(createProductSchema, "body"),
   async (req, res, next) => {
     try {
@@ -55,6 +63,8 @@ router.post(
 
 router.patch(
   "/:id",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
   validationHandler(getProductSchema, "params"),
   validationHandler(updateProductSchema, "body"),
   async (req, res, next) => {
@@ -69,14 +79,20 @@ router.patch(
   }
 );
 
-router.delete("/:id", validationHandler(getProductSchema, "params"), async (req, res, next) => {
+router.delete(
+  "/:id",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
+  validationHandler(getProductSchema, "params"),
+  async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await service.delete(id);
-        res.status(201).json({id});
+      const { id } = req.params;
+      await service.delete(id);
+      res.status(201).json({ id });
     } catch (err) {
-        next(err);
+      next(err);
     }
-});
+  }
+);
 
 module.exports = router;

@@ -9,6 +9,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+require('./utils/auth');
 
 routerApi(app);
 
@@ -18,5 +19,5 @@ app.use(boomErrorHandler);
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log('Escuchando en el puerto: ' +  port);
+    console.log('Listening on port: ' +  port);
   });

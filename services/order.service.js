@@ -11,11 +11,6 @@ class OrderService {
     return newItem;
   }
 
-  async find() {
-    const orders = await models.Order.findAll();
-    return orders;
-  }
-
   async findOne(id) {
     const order = await models.Order.findByPk(id, {
       include: [
@@ -33,6 +28,21 @@ class OrderService {
     return order;
   }
 
+  async findByUser(userId) {
+    const orders = await models.Order.findAll({
+      where: {
+        '$customer.user.id$': userId
+      },
+      include: [
+        {
+          association: 'customer',
+          include: ['user']
+        }
+      ]
+    });
+    return orders;
+  }
+
   async update(id, changes) {
     const order = await this.findOne(id);
     await order.update(changes);
@@ -41,6 +51,11 @@ class OrderService {
 
   async delete(id) {
     const order = await this.findOne(id);
+    await models.OrderProduct.destroy({
+      where: {
+        order_id: id
+      }
+    })
     await order.destroy();
     return { id };
   }

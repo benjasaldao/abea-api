@@ -9,8 +9,11 @@ class UserService {
   }
 
   async find() {
-    const response = await models.User.findAll();
-    return response;
+    const users = await models.User.findAll({
+      attributes: { exclude: ['password', 'recoveryToken']}
+    });
+    
+    return users;
   }
 
   async findOne(id) {
@@ -21,6 +24,13 @@ class UserService {
     }
 
     return user;
+  }
+
+  async findByEmail(email) {
+    const rta = await models.User.findOne({
+      where: { email }
+    });
+    return rta;
   }
 
   async update(id, changes) {
