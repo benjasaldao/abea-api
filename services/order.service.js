@@ -11,6 +11,22 @@ class OrderService {
     return newItem;
   }
 
+  async removeItem(id) {
+    const itemToRemove = await models.OrderProduct.findByPk(id);
+    if (itemToRemove) {
+      await itemToRemove.destroy();
+      return { id };
+    }
+    throw boom.notFound("Order not found");
+  }
+
+  async find() {
+    const orders = await models.Order.findAll({
+      include: [{ association: "user" }],
+    });
+    return orders;
+  }
+
   async findOne(id) {
     const order = await models.Order.findByPk(id, {
       include: [
@@ -21,8 +37,8 @@ class OrderService {
       ],
     });
 
-    if(!order) {
-      throw boom.notFound('Order not found');
+    if (!order) {
+      throw boom.notFound("Order not found");
     }
 
     return order;
@@ -31,34 +47,26 @@ class OrderService {
   async findByUser(userId) {
     const orders = await models.Order.findAll({
       where: {
-        '$customer.user.id$': userId
+        "$user.id$": userId,
       },
-      include: [
-        {
-          association: 'customer',
-          include: ['user']
-        }
-      ]
     });
     return orders;
   }
 
-  async update(id, changes) {
-    const order = await this.findOne(id);
-    await order.update(changes);
-    return { id };
-  }
-
   async delete(id) {
     const order = await this.findOne(id);
-    await models.OrderProduct.destroy({
-      where: {
-        order_id: id
-      }
-    })
-    await order.destroy();
-    return { id };
+    if (order) {
+      await models.OrderProduct.destroy({
+        where: {
+          order_id: id,
+        },
+      });
+      await order.destroy();
+      return { id };
+    }
+    throw boom.notFound("Order not found");
   }
+  
 }
 
 module.exports = OrderService;

@@ -29,18 +29,19 @@ const OrderSchema = {
   },
 }
 
+
 class Order extends Model {
 
   static associate(models) {
     this.belongsTo(models.User, {
-      as: 'user'
+      as: 'user',
     });
     this.belongsToMany(models.Product, {
       as: 'items',
       through: models.OrderProduct,
-      foreignKey: 'order_id',
+      foreignKey: 'orderId',
       otherKey: 'productId'
-    })
+    });
   }
 
   static config(sequelize) {

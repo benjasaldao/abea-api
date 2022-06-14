@@ -13,6 +13,40 @@ const {
 const router = express.Router();
 const service = new OrderService();
 
+router.get(
+  "/",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
+  checkRoles("admin"),
+  async (req, res, next) => {
+    try {
+      const order = await service.find();
+      res.json(order);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/:id",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
+  checkRoles("admin", "customer"),
+  validationHandler(getOrderSchema, "params"),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const order = await service.findOne(id);
+      delete order.dataValues.user.dataValues.password;
+      delete order.dataValues.user.dataValues.recoveryToken;
+      res.json(order);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.post(
   "/",
   checkApiKey,
@@ -47,24 +81,23 @@ router.post(
   }
 );
 
-router.get(
-  "/:id",
+router.post(
+  "/remove-item",
   checkApiKey,
   passport.authenticate("jwt", { session: false }),
   checkRoles("admin", "customer"),
-  validationHandler(getOrderSchema, "params"),
+  validationHandler(getOrderSchema, "body"),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const order = await service.findOne(id);
-      delete order.dataValues.user.dataValues.password;
-      delete order.dataValues.user.dataValues.recoveryToken;
-      res.json(order);
+      const {id} = req.body;
+      const removedItemId = await service.removeItem(id);
+      res.json(removedItemId);
     } catch (error) {
       next(error);
     }
   }
 );
+
 
 router.delete(
   "/:id",
