@@ -36,7 +36,6 @@ router.get(
     try {
       const { id } = req.params;
       const product = await service.findOne(id);
-      console.log(product)
       res.json(product);
     } catch (err) {
       next(err);
@@ -52,8 +51,7 @@ router.post(
   validationHandler(createProductSchema, "body"),
   async (req, res, next) => {
     try {
-      const { body } = req;
-      const newProduct = await service.create(body);
+      const newProduct = await service.create(req);
       res.status(201).json(newProduct);
     } catch (err) {
       next(err);
@@ -70,8 +68,7 @@ router.patch(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { body } = req;
-      const product = await service.update(id, body);
+      const product = await service.update(id, req);
       res.json(product);
     } catch (err) {
       next(err);

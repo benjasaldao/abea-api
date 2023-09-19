@@ -1,10 +1,9 @@
 const { Model, DataTypes, Sequelize } = require("sequelize");
+const { PRODUCT_TABLE } = require("./product.model");
 
-const { CATEGORY_TABLE } = require("./category.model");
+const PRODUCT_COLORS_TABLE = "product_colors";
 
-const PRODUCT_TABLE = "products";
-
-const ProductSchema = {
+const ProductColorsSchema = {
   id: {
     allowNull: false,
     autoIncrement: true,
@@ -19,27 +18,18 @@ const ProductSchema = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  imageId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: "image_id",
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE,
     field: "created_at",
     defaultValue: Sequelize.NOW,
   },
-  categoryId: {
-    field: "category_id",
+  productId: {
+    field: "product_id",
     allowNull: false,
     type: DataTypes.INTEGER,
     references: {
-      model: CATEGORY_TABLE,
+      model: PRODUCT_TABLE,
       key: "id",
     },
     onUpdate: "CASCADE",
@@ -47,23 +37,18 @@ const ProductSchema = {
   },
 };
 
-class Product extends Model {
+class ProductColors extends Model {
   static associate(models) {
-    this.belongsTo(models.Category, { as: "category" });
-    this.hasMany(models.ProductColors, {
-      as: "colors",
-      foreignKey: "productId",
-    });
   }
 
   static config(sequelize) {
     return {
       sequelize,
-      tableName: PRODUCT_TABLE,
-      modelName: "Product",
+      tableName: PRODUCT_COLORS_TABLE,
+      modelName: "ProductColors",
       timestamps: false,
     };
   }
 }
 
-module.exports = { Product, ProductSchema, PRODUCT_TABLE };
+module.exports = { ProductColors, ProductColorsSchema, PRODUCT_COLORS_TABLE };

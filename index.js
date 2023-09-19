@@ -1,27 +1,43 @@
-const express = require('express');
-const cors = require('cors');
-const routerApi = require('./routes');
+const express = require("express");
+const cors = require("cors");
+const routerApi = require("./routes");
+const multer = require("multer");
+const path = require("path");
+const { config } = require("./config/config");
 
-const { logErrors, errorHandler, boomErrorHandler, ormErrorHandler } = require('./middlewares/errorHandler');
+const {
+  logErrors,
+  errorHandler,
+  boomErrorHandler,
+  ormErrorHandler,
+} = require("./middlewares/errorHandler");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, "public/files"),
+  filename: (req, file, cb, filename) => {
+    cb(null, new Date().getTime() + path.extname(file.originalname));
+  },
+});
+app.use(multer({ storage }).single("image"));
 
-const whitelist = ['http://localhost:3000'];
+const whitelist = [config.whiteList];
 const options = {
   origin: (origin, callback) => {
     if (whitelist.includes(origin) || !origin) {
       callback(null, true);
     } else {
-      callback(new Error('no permitido'));
+      callback(new Error("no permitido"));
     }
-  }
-}
+  },
+};
 app.use(cors(options));
 
-require('./utils/auth');
+require("./utils/auth");
 
 routerApi(app);
 
@@ -31,5 +47,5 @@ app.use(boomErrorHandler);
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log('Listening on port: ' +  port);
-  });
+  console.log("Listening on port: " + port);
+});

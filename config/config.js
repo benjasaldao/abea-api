@@ -10,6 +10,7 @@ const config = {
   smtpEmail: process.env.SMTP_EMAIL,
   smtpPassword: process.env.SMTP_PASSWORD,
   recoveryJwtSecret: process.env.RECOVERY_JWT_SECRET,
+  whiteList: process.env.WHITE_LIST,
 };
 
 module.exports = { config };

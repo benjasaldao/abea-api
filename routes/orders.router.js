@@ -8,6 +8,7 @@ const {
   getOrderSchema,
   createOrderSchema,
   addItemSchema,
+  updateOrderItemSchema
 } = require("../schemas/order.schema");
 
 const router = express.Router();
@@ -98,6 +99,41 @@ router.post(
   }
 );
 
+router.get(
+  "/items/:id",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
+  checkRoles("admin", "customer"),
+  validationHandler(getOrderSchema, "params"),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const items = await service.findOrderItems(id);
+      res.json(items);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.patch(
+  "/items/:id",
+  checkApiKey,
+  passport.authenticate("jwt", { session: false }),
+  checkRoles("admin", "customer"),
+  validationHandler(getOrderSchema, "params"),
+  validationHandler(updateOrderItemSchema, "body"),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const {body} = req;
+      const response = await service.updateOrderItem(id, body);
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 router.delete(
   "/:id",

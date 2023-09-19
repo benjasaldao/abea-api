@@ -20,6 +20,25 @@ class OrderService {
     throw boom.notFound("Order not found");
   }
 
+  async findOrderItems(orderId) {
+    const items = await models.OrderProduct.findAll({
+      where: {
+        $order_id$: orderId,
+      },
+      include: ["product", "color"],
+    });
+    return items;
+  }
+
+  async updateOrderItem(itemId, changes) {
+    const response = models.OrderProduct.update(changes, {
+      where: {
+        id: itemId
+      }
+    });
+    return response;
+  }
+
   async find() {
     const orders = await models.Order.findAll({
       include: [{ association: "user" }],
@@ -66,7 +85,6 @@ class OrderService {
     }
     throw boom.notFound("Order not found");
   }
-  
 }
 
 module.exports = OrderService;
