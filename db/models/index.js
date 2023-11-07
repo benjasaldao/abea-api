@@ -10,8 +10,8 @@ function setupModels(sequelize) {
   Product.init(ProductSchema, Product.config(sequelize));
   Category.init(CategorySchema, Category.config(sequelize));
   Order.init(OrderSchema, Order.config(sequelize));
-  OrderProduct.init(OrderProductSchema, OrderProduct.config(sequelize));
   ProductColors.init(ProductColorsSchema, ProductColors.config(sequelize))
+  OrderProduct.init(OrderProductSchema, OrderProduct.config(sequelize));
 
   Category.associate(sequelize.models);
   Product.associate(sequelize.models);
